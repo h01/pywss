@@ -1,0 +1,56 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Pyws - client</title>
+	<script type="text/javascript">
+	var ws;
+	function $(id){
+		return document.getElementById(id);
+	}
+	function debug(msg){
+		$("data").value += msg + "\n";
+	}
+	function connect(){
+		if ($("connect").value == "断开") {
+			debug("[!] 断开链接");
+			ws.close();
+			$("connect").value = "连接";
+			$("server").disabled = false;
+			ws = null;
+			return;
+		};
+		ws = new WebSocket($("server").value);
+		ws.onmessage = function(msg){
+			debug("[+] 收到数据: " + msg.data);
+		}
+		ws.onclose = function(msg){
+			debug("[!] 连接关闭");
+		}
+		ws.onopen = function(msg){
+			debug("[*] 连接成功");
+			$("connect").value = "断开";
+			$("server").disabled = true;
+		}
+	}
+	function send(){
+		var msg = $("msg").value;
+		if (msg == "") {
+			return;
+		};
+		ws.send(msg);
+		debug("[-] 发送数据: " + msg);
+		$("msg").value = "";
+	}
+	</script>
+</head>
+<body>
+	<h1>Python websocket client-demo</h1>
+	<h3><a href="https://github.com/h01/pywss">GitHub</a></h3>
+	<hr>
+	<input type="text" id="server" value="ws://localhost:1234/"><input type="button" id="connect" value="连接" onclick="connect();">
+	<br>
+	<textarea cols="100" rows="10" id="data" readonly></textarea>
+	<br>
+	<input tepe="text" id="msg"><input type="button" id="send" value="发送" onclick="send()">
+</body>
+</html>
